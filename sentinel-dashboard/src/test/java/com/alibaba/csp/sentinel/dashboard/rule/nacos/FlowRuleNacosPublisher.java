@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 
 import java.util.List;
@@ -26,10 +27,12 @@ import com.alibaba.nacos.api.config.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+*/
 /**
  * @author Eric Zhao
  * @since 1.4.0
- */
+ *//*
+
 @Component("flowRuleNacosPublisher")
 public class FlowRuleNacosPublisher implements DynamicRulePublisher<List<FlowRuleEntity>> {
 
@@ -48,3 +51,4 @@ public class FlowRuleNacosPublisher implements DynamicRulePublisher<List<FlowRul
             NacosConfigUtil.GROUP_ID, converter.convert(rules));
     }
 }
+*/

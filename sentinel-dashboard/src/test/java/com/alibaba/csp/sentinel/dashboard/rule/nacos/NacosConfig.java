@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 
 import java.util.List;
@@ -26,10 +27,12 @@ import com.alibaba.nacos.api.config.ConfigService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+*/
 /**
  * @author Eric Zhao
  * @since 1.4.0
- */
+ *//*
+
 @Configuration
 public class NacosConfig {
 
@@ -48,3 +51,4 @@ public class NacosConfig {
         return ConfigFactory.createConfigService("localhost");
     }
 }
+*/
