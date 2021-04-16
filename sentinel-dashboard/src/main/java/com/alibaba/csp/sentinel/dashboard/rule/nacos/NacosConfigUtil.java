@@ -22,9 +22,17 @@ package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 public final class NacosConfigUtil {
 
     public static final String GROUP_ID = "SENTINEL_GROUP";
-    
+    // 流控
     public static final String FLOW_DATA_ID_POSTFIX = "-flow-rules";
-    public static final String PARAM_FLOW_DATA_ID_POSTFIX = "-param-rules";
+    // 降级
+    public static final String DEGRADE_DATA_ID_POSTFIX = "-degrade-rules";
+    // 热点
+    public static final String PARAM_FLOW_DATA_ID_POSTFIX = "-param-flow";
+    // 系统
+    public static final String SYSTEM_DATA_ID_POSTFIX = "-system-rules";
+    // 授权
+    public static final String AUTHORITY_DATA_ID_POSTFIX = "-authority-rules";
+
     public static final String CLUSTER_MAP_DATA_ID_POSTFIX = "-cluster-map";
 
     /**

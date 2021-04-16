@@ -22,6 +22,8 @@ import com.alibaba.csp.sentinel.dashboard.auth.AuthAction;
 import com.alibaba.csp.sentinel.dashboard.client.SentinelApiClient;
 import com.alibaba.csp.sentinel.dashboard.discovery.MachineInfo;
 import com.alibaba.csp.sentinel.dashboard.auth.AuthService.PrivilegeType;
+import com.alibaba.csp.sentinel.dashboard.rule.nacos.authority.AuthorityRuleNacosProvider;
+import com.alibaba.csp.sentinel.dashboard.rule.nacos.authority.AuthorityRuleNacosPublisher;
 import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 import com.alibaba.csp.sentinel.util.StringUtil;
 
@@ -57,6 +59,11 @@ public class AuthorityRuleController {
     @Autowired
     private RuleRepository<AuthorityRuleEntity, Long> repository;
 
+    @Autowired
+    private AuthorityRuleNacosProvider provider;
+    @Autowired
+    private AuthorityRuleNacosPublisher publisher;
+
     @GetMapping("/rules")
     @AuthAction(PrivilegeType.READ_RULE)
     public Result<List<AuthorityRuleEntity>> apiQueryAllRulesForMachine(@RequestParam String app,
@@ -72,7 +79,8 @@ public class AuthorityRuleController {
             return Result.ofFail(-1, "Invalid parameter: port");
         }
         try {
-            List<AuthorityRuleEntity> rules = sentinelApiClient.fetchAuthorityRulesOfMachine(app, ip, port);
+//            List<AuthorityRuleEntity> rules = sentinelApiClient.fetchAuthorityRulesOfMachine(app, ip, port);
+            List<AuthorityRuleEntity> rules = provider.getRules(app);
             rules = repository.saveAll(rules);
             return Result.ofSuccess(rules);
         } catch (Throwable throwable) {
@@ -123,13 +131,14 @@ public class AuthorityRuleController {
         entity.setGmtModified(date);
         try {
             entity = repository.save(entity);
+            publishRules(entity.getApp(), entity.getIp(), entity.getPort());
         } catch (Throwable throwable) {
             logger.error("Failed to add authority rule", throwable);
             return Result.ofThrowable(-1, throwable);
         }
-        if (!publishRules(entity.getApp(), entity.getIp(), entity.getPort())) {
+        /*if (!publishRules(entity.getApp(), entity.getIp(), entity.getPort())) {
             logger.info("Publish authority rules failed after rule add");
-        }
+        }*/
         return Result.ofSuccess(entity);
     }
 
@@ -150,6 +159,7 @@ public class AuthorityRuleController {
         entity.setGmtModified(date);
         try {
             entity = repository.save(entity);
+            publishRules(entity.getApp(), entity.getIp(), entity.getPort());
             if (entity == null) {
                 return Result.ofFail(-1, "Failed to save authority rule");
             }
@@ -157,9 +167,9 @@ public class AuthorityRuleController {
             logger.error("Failed to save authority rule", throwable);
             return Result.ofThrowable(-1, throwable);
         }
-        if (!publishRules(entity.getApp(), entity.getIp(), entity.getPort())) {
+        /*if (!publishRules(entity.getApp(), entity.getIp(), entity.getPort())) {
             logger.info("Publish authority rules failed after rule update");
-        }
+        }*/
         return Result.ofSuccess(entity);
     }
 
@@ -175,17 +185,23 @@ public class AuthorityRuleController {
         }
         try {
             repository.delete(id);
+            publishRules(oldEntity.getApp(), oldEntity.getIp(), oldEntity.getPort());
         } catch (Exception e) {
             return Result.ofFail(-1, e.getMessage());
         }
-        if (!publishRules(oldEntity.getApp(), oldEntity.getIp(), oldEntity.getPort())) {
+        /*if (!publishRules(oldEntity.getApp(), oldEntity.getIp(), oldEntity.getPort())) {
             logger.error("Publish authority rules failed after rule delete");
-        }
+        }*/
         return Result.ofSuccess(id);
     }
 
-    private boolean publishRules(String app, String ip, Integer port) {
+    /*private boolean publishRules(String app, String ip, Integer port) {
         List<AuthorityRuleEntity> rules = repository.findAllByMachine(MachineInfo.of(app, ip, port));
         return sentinelApiClient.setAuthorityRuleOfMachine(app, ip, port, rules);
+    }*/
+
+    private void publishRules(String app, String ip, Integer port) throws Exception {
+        List<AuthorityRuleEntity> rules = repository.findAllByApp(app);
+        publisher.publish(app, rules);
     }
 }
